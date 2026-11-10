@@ -722,6 +722,22 @@ It prints:
 
 The mean changes at index 500; the alarm follows once enough evidence accumulates. This meter uses the full stream history and cannot remove observations, so it cannot be wrapped in :class:`~pysad.statistics.RunningStatistic`.
 
+Detect a change with an adaptive window
+---------------------------------------
+
+This script streams 1,000 values from a uniform distribution in [0, 0.5] followed by 1,000 values in [0.3, 0.8]. It updates :class:`~pysad.statistics.ADWINMeter` directly and checks ``drift_detected`` after each update. Unlike other meters, ADWIN reports a change when the adaptive window shrinks, so the script checks ``meter.drift_detected`` rather than thresholding ``meter.get()`` (which returns the current window mean). ADWIN assumes that values fall in [0, 1]; values from a known range :math:`[a, b]` should be normalized as :math:`(x - a) / (b - a)`.
+
+.. literalinclude:: ../examples/example_adwin.py
+   :language: python
+
+It prints:
+
+.. code-block:: text
+
+   First change detected at index 1039 (zero-based), width 464, mean 0.28
+
+The mean changes at index 1000. When enough evidence accumulates at index 1039, ADWIN detects the shift, shrinks its window to discard older observations from before the change, and adapts to the new mean.
+
 Detect a drift with Hoeffding's bounds
 --------------------------------------
 
